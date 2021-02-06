@@ -2,6 +2,7 @@ import ErrorResponse from '../utils/errorResponse'
 import asyncHandler from '../middleware/async'
 import User from '../models/user'
 import { config as dotenvConfig } from 'dotenv'
+import { clearHash } from '../utils/cache'
 
 dotenvConfig()
 const env = process.env
@@ -24,6 +25,7 @@ export const getUsers = asyncHandler(async (req, res, next) => {
 export const getUser = asyncHandler(async (req, res, next) => {
     const user = await User
         .findById(req.params.id)
+        .cache({ key: req.user.id })
 
     res.status(200).json({
         success: true,
@@ -44,6 +46,8 @@ export const createUser = asyncHandler(async (req, res, next) => {
         success: true,
         data: user
     })
+
+    clearHash(req.user.id)
 
 })
 
@@ -66,6 +70,8 @@ export const updateUser = asyncHandler(async (req, res, next) => {
         data: user
     })
 
+    clearHash(req.user.id)
+
 })
 
 
@@ -87,4 +93,5 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
         data: {}
     })
 
+    clearHash(req.user.id)
 })

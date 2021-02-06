@@ -4,6 +4,7 @@ import asyncHandler from '../middleware/async'
 import User from '../models/user'
 import emailHandler from '../utils/emailHandler'
 import { config as dotenvConfig } from 'dotenv'
+import { updateUser } from './user'
 
 dotenvConfig()
 const env = process.env
@@ -15,12 +16,12 @@ const env = process.env
 @access     Public
 */
  export const register = asyncHandler(async (req, res, next) => {
-    const { method, name, firstname, email, password, role  } = req.body
+    const { method, surname, firstname, email, password, role  } = req.body
     
     // Create user
     const user = await User.create({
         method,
-        name,
+        surname,
         firstname,
         email, 
         password,
@@ -33,8 +34,8 @@ const env = process.env
 
 
 /*
-@desc       Register user
-@route      POST /api/v1/auth/register
+@desc       Log user in
+@route      POST /api/v1/auth/login
 @access     Public
 */
 export const login = asyncHandler(async (req, res, next) => {
@@ -102,8 +103,7 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 
     if(!user) return next(new ErrorResponse('There is no user with that email', 404))
 
-    const resetPasswordToken = user.getResetPasswordToken()
-    console.log('resetPasswordToken', resetPasswordToken)
+    const resetPasswordToken = await user.getResetPasswordToken()
 
     await user.save({ validateBeforeSave: false })
 
@@ -126,6 +126,8 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
                 message: 'email sent'
             }
         })
+
+        return
 
     } catch (error) {
         console.error(error)
@@ -168,6 +170,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     user.password = req.body.password
     user.resetPassword = undefined
     user.resetPasswordExpire = undefined
+
     await user.save()
 
     sendTokenResponse(user, 200, res)
@@ -181,6 +184,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
 */
 export const updateDetails = asyncHandler(async (req, res, next) => {
 
+
     // Define fields to update
     const unUpdatableFields = [
         'method', 
@@ -191,19 +195,21 @@ export const updateDetails = asyncHandler(async (req, res, next) => {
         'createdAt'
     ]
 
-
     // Define updatable fields
     const fieldsToUpdate = Object.keys(req.body).filter(field => !unUpdatableFields.includes(field))
+    const user = fieldsToUpdate.reduce((acc, curr) => {
+        acc[curr] = req.body[curr]
+        return acc
+    }, {})
 
-
-    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, user, {
         new: true,
         runValidators: true
     })
 
     res.status(200).json({
         success: true,
-        data: user
+        data: updatedUser
     })
 })
 

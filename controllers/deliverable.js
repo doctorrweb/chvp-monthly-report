@@ -2,6 +2,7 @@ import ErrorResponse from '../utils/errorResponse'
 import asyncHandler from '../middleware/async'
 import Deliverable from '../models/deliverable'
 import { config as dotenvConfig } from 'dotenv'
+import { clearHash } from '../utils/cache'
 
 dotenvConfig()
 const env = process.env
@@ -42,6 +43,7 @@ export const getDeliverables = asyncHandler( async (req, res, next) => {
 export const getDeliverable = asyncHandler( async (req, res, next) => {
     const deliverable = await Deliverable
         .findById(req.params.id)
+        .cache({ key: req.originalUrl })
 
     res.status(200).json({
         success: true,
@@ -73,6 +75,8 @@ export const updateDeliverable = asyncHandler( async (req, res, next) => {
         data: deliverable
     })
 
+    clearHash(req.originalUrl)
+
 })
 
 
@@ -98,5 +102,7 @@ export const deleteDeliverable = asyncHandler( async (req, res, next) => {
         success: true,
         data: {}
     })
+
+    clearHash(req.originalUrl)
 
 })

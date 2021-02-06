@@ -35,13 +35,21 @@ const UserSchema = new Schema({
         minlength: [6, 'Your password must have 6 characters minimum'],
         select: false,
     },
-    resetPassword: String,
-    resetPasswordExpire: Date,
+    resetPassword: {
+        type: String,
+        select: false
+    },
+    resetPasswordExpire: {
+        type: Date,
+        select: false
+    },
     surname: {
-        type: String
+        type: String,
+        required: [true, 'Please add a surname']
     },
     firstname: {
-        type: String
+        type: String,
+        required: [true, 'Please add a firstname']
     },
     role: {
         type: String,
