@@ -17,7 +17,7 @@ const deliverableRouter = Router()
 
 
 deliverableRouter.route('/')
-    .get(advancedFiltering(Deliverable), getDeliverables) 
+    .get(getDeliverables) 
     .post(createDeliverable)
 
 

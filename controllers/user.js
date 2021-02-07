@@ -10,10 +10,22 @@ const env = process.env
 /*
 @desc       GET all users
 @route      GET /api/v1/users
-@access     Private/admin
+@access     Private
 */
 export const getUsers = asyncHandler(async (req, res, next) => {
-    res.status(200).json(res.advancedFiltering)
+    // clearHash(req.user.id)
+    // clearHash(req.originalUrl)
+    // res.status(200).json(res.advancedFiltering)
+
+    // clearHash(req.originalUrl)
+
+    const users = await User.find({})
+
+    res.status(200).json({
+        success: true,
+        count: users.length,
+        data: users
+    })
 })
 
 
@@ -23,9 +35,10 @@ export const getUsers = asyncHandler(async (req, res, next) => {
 @access     Private/admin
 */
 export const getUser = asyncHandler(async (req, res, next) => {
+    
     const user = await User
         .findById(req.params.id)
-        .cache({ key: req.user.id })
+        // .cache({ key: req.user.id })
 
     res.status(200).json({
         success: true,
@@ -36,18 +49,18 @@ export const getUser = asyncHandler(async (req, res, next) => {
 
 /*
 @desc       Create user
-@route      POST /api/v1/users/:id
+@route      POST /api/v1/users
 @access     Private/admin
 */
 export const createUser = asyncHandler(async (req, res, next) => {
     const user = await User.create(req.body)
-
+    
     res.status(200).json({
         success: true,
         data: user
     })
-
-    clearHash(req.user.id)
+    
+    // clearHash(req.user.id)
 
 })
 
@@ -59,18 +72,17 @@ export const createUser = asyncHandler(async (req, res, next) => {
 */
 export const updateUser = asyncHandler(async (req, res, next) => {
 
-    const user = await User.findById(req.params.id)
-
-    if(!user) return next(new ErrorResponse(`No Resource found with the Id of ${req.params.id}`))
-
-    user.update(req.body)
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    })
 
     res.status(200).json({
         success: true,
         data: user
     })
 
-    clearHash(req.user.id)
+    // clearHash(req.user.id)
 
 })
 
@@ -93,5 +105,5 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
         data: {}
     })
 
-    clearHash(req.user.id)
+    // clearHash(req.user.id)
 })

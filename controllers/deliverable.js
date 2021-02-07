@@ -30,8 +30,15 @@ export const createDeliverable = asyncHandler( async (req, res, next) => {
 @access     Private
 */
 export const getDeliverables = asyncHandler( async (req, res, next) => {
-    // console.log(Object.keys(req))
-    res.status(200).json(res.advancedFiltering)
+    
+    const deliverables = await Deliverable.find({})
+
+    res.status(200).json({
+        success: true,
+        count: deliverables.length,
+        data: deliverables
+    })
+    
 })
 
 
@@ -43,7 +50,7 @@ export const getDeliverables = asyncHandler( async (req, res, next) => {
 export const getDeliverable = asyncHandler( async (req, res, next) => {
     const deliverable = await Deliverable
         .findById(req.params.id)
-        .cache({ key: req.originalUrl })
+        // .cache({ key: req.originalUrl })
 
     res.status(200).json({
         success: true,
@@ -68,14 +75,17 @@ export const updateDeliverable = asyncHandler( async (req, res, next) => {
         return next(new ErrorResponse(`User ${req.params.id} is not authorize to update this content`, 401))
     }
 
-    deliverable.update(req.body)
+    deliverable = await Deliverable.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    })
 
     res.status(200).json({
         success: true,
         data: deliverable
     })
 
-    clearHash(req.originalUrl)
+    // clearHash(req.originalUrl)
 
 })
 
@@ -103,6 +113,6 @@ export const deleteDeliverable = asyncHandler( async (req, res, next) => {
         data: {}
     })
 
-    clearHash(req.originalUrl)
+    // clearHash(req.originalUrl)
 
 })

@@ -9,6 +9,7 @@ import {
 import User from '../models/user'
 import advancedFiltering from '../middleware/adavancedFiltering'
 import { protect, authorize } from '../middleware/auth'
+import cleanCache from '../middleware/cleanCache'
 
 const userRouter = Router()
 

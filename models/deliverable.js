@@ -20,11 +20,11 @@ const DeliverableSchema = new Schema({
     ],
     startDate: {
         type: Date,
-        required: [true, 'Please add an Start Date']
+        // required: [true, 'Please add an Start Date']
     },
     endDate: {
         type: Date,
-        required: [true, 'Please add an End Date']
+        // required: [true, 'Please add an End Date']
     },
     completionRate: {
         type: Number,

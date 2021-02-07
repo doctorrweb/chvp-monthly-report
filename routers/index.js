@@ -10,6 +10,6 @@ const appRouter = Router()
 // appRouter.use(/* name of the router  */)
 appRouter.use('/users', userRouter)
 appRouter.use('/auth', authRouter)
-appRouter.use('/deliverable', deliverableRouter)
+appRouter.use('/deliverables', deliverableRouter)
 
 export default appRouter
