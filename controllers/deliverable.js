@@ -2,7 +2,7 @@ import ErrorResponse from '../utils/errorResponse'
 import asyncHandler from '../middleware/async'
 import Deliverable from '../models/deliverable'
 import { config as dotenvConfig } from 'dotenv'
-import { clearHash } from '../utils/cache'
+// import { clearHash } from '../utils/cache'
 
 dotenvConfig()
 const env = process.env
@@ -30,15 +30,7 @@ export const createDeliverable = asyncHandler( async (req, res, next) => {
 @access     Private
 */
 export const getDeliverables = asyncHandler( async (req, res, next) => {
-    
-    const deliverables = await Deliverable.find({})
-
-    res.status(200).json({
-        success: true,
-        count: deliverables.length,
-        data: deliverables
-    })
-    
+    res.status(200).json(res.advancedFiltering)
 })
 
 
@@ -50,7 +42,15 @@ export const getDeliverables = asyncHandler( async (req, res, next) => {
 export const getDeliverable = asyncHandler( async (req, res, next) => {
     const deliverable = await Deliverable
         .findById(req.params.id)
-        // .cache({ key: req.originalUrl })
+        .populate({
+            path: 'translation',
+            match: {_id: {$ne: req.params.id}},
+            select: 'name comment startDate endDate completionRate type'
+        })
+        .populate({
+            path: 'responsible',
+            select: 'surname firstname email'
+        })
 
     res.status(200).json({
         success: true,
@@ -75,14 +75,18 @@ export const updateDeliverable = asyncHandler( async (req, res, next) => {
         return next(new ErrorResponse(`User ${req.params.id} is not authorize to update this content`, 401))
     }
 
-    deliverable = await Deliverable.findByIdAndUpdate(req.params.id, req.body, {
+    req.body.updateDetails = { by: req.user.id }
+
+    const newDeliverable = await Deliverable.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
     })
 
+    // await Deliverable.updateOne({_id: req.params.id}, req.body, {timestamps: true})
+
     res.status(200).json({
         success: true,
-        data: deliverable
+        data: newDeliverable
     })
 
     // clearHash(req.originalUrl)

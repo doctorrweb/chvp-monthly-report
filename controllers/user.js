@@ -13,19 +13,9 @@ const env = process.env
 @access     Private
 */
 export const getUsers = asyncHandler(async (req, res, next) => {
+    res.status(200).json(res.advancedFiltering)
+    
     // clearHash(req.user.id)
-    // clearHash(req.originalUrl)
-    // res.status(200).json(res.advancedFiltering)
-
-    // clearHash(req.originalUrl)
-
-    const users = await User.find({})
-
-    res.status(200).json({
-        success: true,
-        count: users.length,
-        data: users
-    })
 })
 
 

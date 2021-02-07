@@ -13,11 +13,16 @@ import cleanCache from '../middleware/cleanCache'
 
 const userRouter = Router()
 
+const populateUser = [
+    { path: 'deliverables',
+        select: 'name startDate endDate completionRate type lang translation'}
+]
+
  userRouter.use(protect)
  userRouter.use(authorize('administrator'))
 
 userRouter.route('/')
-    .get(advancedFiltering(User), getUsers) 
+    .get(advancedFiltering(User, populateUser), getUsers) 
     .post(createUser)
 
 userRouter.route('/:id')

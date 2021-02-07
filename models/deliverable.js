@@ -7,17 +7,20 @@ const DeliverableSchema = new Schema({
         required: [true, 'Please add a name'],
         unique: true,
         trim: true,
-        maxlength: [50, 'Name cannot be more than 50 characters']
+        maxlength: [100, 'Name cannot be more than 50 characters']
     },
     slug: String,
-    comments: [
-        {
-            type: String,
-            trim: true,
-            required: [true, 'Please add a comment'],
-            maxlength: [500, 'Comment cannot be more than 500 characters']
-        }
-    ],
+    comment: {
+        type: String,
+        trim: true,
+        required: [
+            function () {
+                return this.type === 'initiative'
+            },
+            'Please add a comment'
+        ],
+        maxlength: [500, 'Comment cannot be more than 500 characters']
+    },
     startDate: {
         type: Date,
         // required: [true, 'Please add an Start Date']
@@ -56,6 +59,7 @@ const DeliverableSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    order: Number,
     updateDetails: {
         date: {
             type: Date,
@@ -64,8 +68,7 @@ const DeliverableSchema = new Schema({
         by: {
             type: Schema.ObjectId,
             ref: 'User',
-        },
-        info: String,
+        }
     },
     initiative: {
         type: Schema.ObjectId,
@@ -76,6 +79,15 @@ const DeliverableSchema = new Schema({
             },
             'The linked initiative is required'
         ]
+    },
+    lang: {
+        type: String,
+        enum: [ 'en', 'fr' ],
+        required: [true, 'Please choose a language']
+    },
+    translation: {
+        type: Schema.ObjectId,
+        ref: 'Deliverable'
     },
     responsible: {
         type: Schema.ObjectId,

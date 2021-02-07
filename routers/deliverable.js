@@ -15,9 +15,15 @@ const deliverableRouter = Router()
     deliverableRouter.use(protect)
     deliverableRouter.use(authorize('administrator'))
 
+    const populateDeliverables = [
+        { path: 'translation',
+            select: 'name startDate endDate completionRate type' },
+        { path: 'responsible',
+            select: 'surname firstname email' },
+    ]
 
 deliverableRouter.route('/')
-    .get(getDeliverables) 
+    .get(advancedFiltering(Deliverable, populateDeliverables), getDeliverables) 
     .post(createDeliverable)
 
 

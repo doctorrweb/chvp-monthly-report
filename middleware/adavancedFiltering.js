@@ -44,7 +44,7 @@ const advancedFiltering = (model, populate) => async (req, res, next) => {
     query = query.skip(startIndex).limit(limit)
 
     if (populate) {
-        query = query.populate(populate)
+        populate.map(item => query.populate(item))
     }
 
     // Pagination Result
@@ -65,9 +65,12 @@ const advancedFiltering = (model, populate) => async (req, res, next) => {
     }
 
     // Executing query
-    const results = await query.cache({
-        key: req.user.id
-    })
+    const results = await query
+
+    // // Executing query with caching activated
+    // const results = await query.cache({
+    //     key: req.user.id
+    // })
 
     res.advancedFiltering = {
         success: true,
